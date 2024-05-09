@@ -13,6 +13,8 @@ spec:
     name: mashirot
     website: https://github.com/mashirot
   logo: logo.png
+  configMapName: plugin-typecho-configmap
+  settingName: plugin-typecho-settings
   homepage: https://github.com/mashirot/halo-plugin-typecho#readme
   repo: https://github.com/mashirot/halo-plugin-typecho
   issues: https://github.com/mashirot/halo-plugin-typecho/issues

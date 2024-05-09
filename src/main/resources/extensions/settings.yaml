@@ -1,0 +1,15 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: plugin-typecho-settings
+spec:
+  forms:
+    - group: basic
+      label: 基本设置
+      formSchema:
+        - $formkit: text
+          label: 身份令牌(PAT)
+          name: pat
+          validation: required
+          value: ""
+          help: 请在个人中心生成，必须有文章管理权限
