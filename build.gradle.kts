@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.9.24"
     id("com.github.node-gradle.node") version "7.0.2"
-    id("run.halo.plugin.devtools") version "0.0.7"
+    id("run.halo.plugin.devtools") version "0.0.8-SNAPSHOT"
 }
 
 group = "io.sakurasou.halo.typecho"
@@ -24,9 +24,13 @@ dependencies {
     compileOnly("run.halo.app:api")
     implementation("commons-io:commons-io:2.16.1")
     implementation("org.apache.commons:commons-compress:1.26.1")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     implementation("org.commonmark:commonmark:0.22.0")
+    implementation("com.belerweb:pinyin4j:2.5.1")
 
     testImplementation("run.halo.app:api")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
