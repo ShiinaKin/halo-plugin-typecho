@@ -1,76 +1,14 @@
-# plugin-starter
+# plugin-typecho
 
-Halo 2.0 插件开发快速开始模板。
+Halo2.0的Typecho文章迁移插件，导入由 [Typecho-Plugin-Tp2MD](https://github.com/mashirot/Typecho-Plugin-Tp2MD) 生成的文件
 
-## 开发环境
+## 使用步骤
 
-插件开发的详细文档请查阅：<https://docs.halo.run/developer-guide/plugin/introduction>
+1. 安装插件
+2. 在 `个人中心-个人令牌` 生成PAT令牌, 必要权限:`文章管理`, `页面管理`
+3. 在插件的设置中填入PAT令牌
+4. 在Typecho安装对应插件并导出文件
+5. 在 `Typecho迁移` 菜单内上传文件，并等待Message通知结果
 
-所需环境：
-
-1. Java 17
-2. Node 18
-3. pnpm 8
-4. Docker (可选)
-
-克隆项目：
-
-```bash
-git clone git@github.com:halo-sigs/plugin-starter.git
-
-# 或者当你 fork 之后
-
-git clone git@github.com:{your_github_id}/plugin-starter.git
-```
-
-```bash
-cd path/to/plugin-starter
-```
-
-### 运行方式 1（推荐）
-
-> 此方式需要本地安装 Docker
-
-```bash
-# macOS / Linux
-./gradlew pnpmInstall
-
-# Windows
-./gradlew.bat pnpmInstall
-```
-
-```bash
-# macOS / Linux
-./gradlew haloServer
-
-# Windows
-./gradlew.bat haloServer
-```
-
-执行此命令后，会自动创建一个 Halo 的 Docker 容器并加载当前的插件，更多文档可查阅：<https://docs.halo.run/developer-guide/plugin/basics/devtools>
-
-### 运行方式 2
-
-> 此方式需要使用源码运行 Halo
-
-编译插件：
-
-```bash
-# macOS / Linux
-./gradlew build
-
-# Windows
-./gradlew.bat build
-```
-
-修改 Halo 配置文件：
-
-```yaml
-halo:
-  plugin:
-    runtime-mode: development
-    fixedPluginPath:
-      - "/path/to/plugin-starter"
-```
-
-最后重启 Halo 项目即可。
+> 注意：
+> 1. 不要重复导入文章，`上传`按钮没有做防抖，点击一次等待结果即可
