@@ -4,4 +4,4 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = 'plugin-typecho'
+rootProject.name = "plugin-typecho"
