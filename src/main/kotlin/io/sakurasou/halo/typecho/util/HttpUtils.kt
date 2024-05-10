@@ -13,7 +13,7 @@ import java.io.IOException
 object HttpUtils {
     private val client = OkHttpClient()
 
-    fun sendPostReq(url: String, body: String, pat: String) {
+    fun sendPostReq(url: String, body: String, pat: String): Boolean {
         val jsonMediaType = "application/json; charset=utf-8".toMediaType()
         val reqBody = body.toRequestBody(jsonMediaType)
 
@@ -23,11 +23,9 @@ object HttpUtils {
             .addHeader("Authorization", "Bearer $pat")
             .build()
 
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
-            val respData = response.body?.string()
-
-            // TODO 判断是否成功
+        return client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw IOException("http status code $response")
+            response.isSuccessful
         }
     }
 
@@ -39,7 +37,7 @@ object HttpUtils {
             .build()
 
         return client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            if (!response.isSuccessful) throw IOException("http status code $response")
             response.body?.string() ?: ""
         }
     }

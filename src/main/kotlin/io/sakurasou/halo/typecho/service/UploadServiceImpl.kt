@@ -129,8 +129,7 @@ class UploadServiceImpl(
         HttpUtils.sendPostReq(createTagUrl, jsonBody, pat)
     }
 
-    @Throws(IOException::class)
-    private fun handleCreatePost(post: Post, content: Content) {
+    private fun handleCreatePost(post: Post, content: Content): Boolean {
         val pat = patServiceImpl.getPAT()
         val draftPostUrl = "http://localhost:8090/apis/api.console.halo.run/v1alpha1/posts"
         val postRequest = PostRequest(post, content)
