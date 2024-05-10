@@ -9,15 +9,15 @@ export default definePlugin({
     {
       parentName: "Root",
       route: {
-        path: "/example",
-        name: "Example",
+        path: "/typecho",
+        name: "Typecho",
         component: HomeView,
         meta: {
-          title: "示例页面",
+          title: "Typecho迁移",
           searchable: true,
           menu: {
-            name: "示例页面",
-            group: "示例分组",
+            name: "Typecho迁移",
+            group: "tool",
             icon: markRaw(IconPlug),
             priority: 0,
           },
