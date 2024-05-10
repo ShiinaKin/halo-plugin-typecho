@@ -35,8 +35,12 @@ class UploadServiceImpl(
     private val htmlRenderer = HtmlRenderer.builder().build()
 
     fun handlePosts(postGroupByCategory: Map<String, List<Pair<RawMetaData, String>>>) {
+    fun handlePosts(postGroupByCategory: Map<String, List<Pair<RawMetaData, String>>>): Pair<Int, Int> {
         val categories = handleListCategories().toMutableMap()
         val tags = handleListTags().toMutableMap()
+
+        var totalCnt = 0
+        var succeedCnt = 0
 
         for ((categoryName, posts) in postGroupByCategory) {
             val categoryPinyinNamed = PinyinUtils.trans2Pinyin(categoryName)
@@ -57,6 +61,7 @@ class UploadServiceImpl(
             }
 
             for ((rawMetaData, mdContent) in posts) {
+                totalCnt++
                 val rawTags = rawMetaData.tags
                 rawTags?.filterNot { tags.containsKey(it) }?.forEach {
                     val tagPinyinNamed = PinyinUtils.trans2Pinyin(it)
@@ -84,9 +89,21 @@ class UploadServiceImpl(
                 val document = mdParser.parse(mdContent)
                 val content = Content(mdContent, htmlRenderer.render(document), MARKDOWN)
 
-                handleCreatePost(post, content)
+                val result = handleCreatePost(post, content)
+                if (result) succeedCnt++
             }
         }
+
+        return totalCnt to succeedCnt
+    }
+
+    private fun handleCreatePage(page: SinglePage, content: Content): Boolean {
+        val pat = patServiceImpl.getPAT()
+        val draftPostUrl = "http://localhost:8090/apis/api.console.halo.run/v1alpha1/singlepages"
+        val postRequest = PageRequest(page, content)
+        val jsonBody = JSON_MAPPER.writeValueAsString(postRequest)
+
+        return HttpUtils.sendPostReq(draftPostUrl, jsonBody, pat)
     }
 
     private fun handleListCategories(): Map<String, String> {
@@ -135,7 +152,8 @@ class UploadServiceImpl(
         val postRequest = PostRequest(post, content)
         val jsonBody = JSON_MAPPER.writeValueAsString(postRequest)
 
-        HttpUtils.sendPostReq(draftPostUrl, jsonBody, pat)
+        return HttpUtils.sendPostReq(draftPostUrl, jsonBody, pat)
+    }
     }
 
     private fun generateTagSpec(tagName: String, tagPinyinNamed: String) = TagSpec().apply {
