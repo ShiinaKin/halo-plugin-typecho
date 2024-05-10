@@ -3,6 +3,7 @@ package io.sakurasou.halo.typecho.controller
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.sakurasou.halo.typecho.service.UploadServiceImpl
 import io.sakurasou.halo.typecho.util.CompressUtils
+import io.sakurasou.halo.typecho.util.PAGE
 import io.sakurasou.halo.typecho.util.POST
 import io.sakurasou.halo.typecho.util.ParserUtils
 import org.apache.commons.io.FileUtils
@@ -30,8 +31,7 @@ class TypechoController(
     private val logger = KotlinLogging.logger { this::class.java }
 
     @PostMapping("/upload")
-    @Throws(IOException::class)
-    fun uploadTypechoFile(@RequestPart("file") file: Mono<FilePart>): Mono<String> {
+    fun uploadTypechoFile(@RequestPart("file") file: Mono<FilePart>): Mono<Result<String>> {
         val uploadFile = File("temp/", System.currentTimeMillis().toString() + "")
         val unCompressedFile = File("temp/", System.currentTimeMillis().toString() + "unz")
         uploadFile.createNewFile()
@@ -42,15 +42,16 @@ class TypechoController(
                     CompressUtils.unCompress(upload, unCompressedFile)
                     val result = ParserUtils.traverseFolder(unCompressedFile)
 
-                    // page singlepages.content.halo.run/{}
-                    // TODO insert page
+                    val pageResult = uploadService.handlePages(result[PAGE]!!)
+                    val postResult = uploadService.handlePosts(result[POST]!!)
 
-                    // post
-                    uploadService.handlePosts(result[POST]!!)
+                    Result.success(
+                        "Total Pages: ${pageResult.first} Succeeded: ${pageResult.second}\n" +
+                                "Total Posts: ${postResult.first} Succeeded: ${postResult.second}"
+                    )
                 } catch (e: Exception) {
-                    throw RuntimeException(e)
+                    throw e
                 }
-                "ok"
             }
             .doFinally {
                 try {
@@ -58,14 +59,20 @@ class TypechoController(
                     FileUtils.deleteDirectory(unCompressedFile)
                     logger.info { "unzTemp file deleted: true" }
                 } catch (e: IOException) {
-                    logger.info { "unzTemp file deleted: false" }
-                    throw RuntimeException(e)
+                    logger.error { "unzTemp file deleted: false" }
+                    throw e
                 }
             }
             .onErrorResume {
-                it.printStackTrace()
-                // TODO return err
-                Mono.just<String>(it.toString())
+                logger.error { it }
+                Mono.just(Result.failure(it.message ?: "unknown err"))
             }
+    }
+
+    data class Result<out T>(val success: Boolean, val failure: Boolean, val data: T?, val msg: String?) {
+        companion object {
+            fun <T> success(data: T) = Result(success = true, failure = false, data, null)
+            fun failure(msg: String) = Result(success = false, failure = true, null, msg)
+        }
     }
 }
