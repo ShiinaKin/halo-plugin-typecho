@@ -1,7 +1,6 @@
 package io.sakurasou.halo.typecho.controller
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.sakurasou.halo.typecho.execption.NoPATException
 import io.sakurasou.halo.typecho.service.UploadServiceImpl
 import io.sakurasou.halo.typecho.util.CompressUtils
 import io.sakurasou.halo.typecho.util.POST
@@ -62,10 +61,6 @@ class TypechoController(
                     logger.info { "unzTemp file deleted: false" }
                     throw RuntimeException(e)
                 }
-            }
-            .onErrorResume(NoPATException::class.java) {
-                // TODO return err
-                Mono.just("")
             }
             .onErrorResume {
                 it.printStackTrace()

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.kotlinModule
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.sakurasou.halo.typecho.execption.NoPATException
 import org.springframework.stereotype.Service
 import run.halo.app.extension.ConfigMap
 import run.halo.app.extension.ExtensionClient
@@ -24,7 +23,7 @@ class PATServiceImpl(
         val configMap = extensionClient.fetch(ConfigMap::class.java, "plugin-typecho-configmap").get()
         val basicGroup = jsonMapper.readValue(configMap.data["basic"], Map::class.java)
         val pat = basicGroup["pat"] as String?
-        return pat?.let { it.ifBlank { throw NoPATException("No PAT") } }
-            ?: throw NoPATException("No PAT")
+        return pat?.let { it.ifBlank { throw RuntimeException("No PAT") } }
+            ?: throw RuntimeException("No PAT")
     }
 }
