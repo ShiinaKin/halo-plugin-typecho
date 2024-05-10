@@ -27,7 +27,7 @@ object ParserUtils {
 
     @Throws(IOException::class)
     fun traverseFolder(folder: File): Map<String, Map<String, List<Pair<RawMetaData, String>>>> {
-        val files = folder.listFiles()
+        val files = folder.listFiles() ?: throw RuntimeException("wrong file struct")
         val rootFolder = if (files.size < 2) files[0] else folder
         val result: MutableMap<String, Map<String, List<Pair<RawMetaData, String>>>> = HashMap(3)
 
@@ -63,9 +63,9 @@ object ParserUtils {
             val beginIndex = rawContent.indexOf("---")
             val endIdx = rawContent.indexOf("---", 3)
             val metaDataStr = rawContent.substring(beginIndex + 3, endIdx)
-            val postContent = rawContent.substring(endIdx + 3)
+            val content = rawContent.substring(endIdx + 3)
             val metaData = YAML_MAPPER.readValue(metaDataStr, RawMetaData::class.java)
-            parseResult.add(Pair(metaData, postContent))
+            parseResult.add(Pair(metaData, content))
         }
         return parseResult
     }
