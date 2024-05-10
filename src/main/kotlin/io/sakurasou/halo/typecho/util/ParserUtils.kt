@@ -1,6 +1,9 @@
 package io.sakurasou.halo.typecho.util
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.sakurasou.halo.typecho.entity.RawMetaData
 import org.apache.commons.io.FileUtils
@@ -12,6 +15,7 @@ import java.util.stream.*
 
 const val PAGE = "page"
 const val POST = "post"
+val JSON_MAPPER: ObjectMapper = ObjectMapper().registerModules(JavaTimeModule(), kotlinModule())
 
 /**
  * @author mashirot

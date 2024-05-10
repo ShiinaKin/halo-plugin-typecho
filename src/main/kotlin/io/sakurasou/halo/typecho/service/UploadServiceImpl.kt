@@ -1,11 +1,9 @@
 package io.sakurasou.halo.typecho.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.kotlinModule
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.sakurasou.halo.typecho.entity.RawMetaData
 import io.sakurasou.halo.typecho.util.HttpUtils
+import io.sakurasou.halo.typecho.util.JSON_MAPPER
 import io.sakurasou.halo.typecho.util.PinyinUtils
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
@@ -35,7 +33,6 @@ class UploadServiceImpl(
     private val logger = KotlinLogging.logger { this::class.java }
     private val mdParser = Parser.builder().build()
     private val htmlRenderer = HtmlRenderer.builder().build()
-    private val jsonMapper = ObjectMapper().registerModules(JavaTimeModule(), kotlinModule())
 
     fun handlePosts(postGroupByCategory: Map<String, List<Pair<RawMetaData, String>>>) {
         val categories = handleListCategories().toMutableMap()
@@ -105,7 +102,7 @@ class UploadServiceImpl(
     private fun handleListTagsOrCategories(url: String): Map<String, String> {
         val pat = patServiceImpl.getPAT()
         val respJson = HttpUtils.sendGetReq(url, pat)
-        val items = jsonMapper.readValue(respJson, Map::class.java)["items"] as List<*>
+        val items = JSON_MAPPER.readValue(respJson, Map::class.java)["items"] as List<*>
         return items.associate {
             it as Map<*, *>
             val spec = it["spec"] as Map<*, *>
@@ -116,20 +113,18 @@ class UploadServiceImpl(
         }
     }
 
-    @Throws(IOException::class)
     private fun handleCreateCategory(category: Category) {
         val pat = patServiceImpl.getPAT()
         val createCategoryUrl = "http://localhost:8090/apis/content.halo.run/v1alpha1/categories"
-        val jsonBody = jsonMapper.writeValueAsString(category)
+        val jsonBody = JSON_MAPPER.writeValueAsString(category)
 
         HttpUtils.sendPostReq(createCategoryUrl, jsonBody, pat)
     }
 
-    @Throws(IOException::class)
     private fun handleCreateTag(tag: Tag) {
         val pat = patServiceImpl.getPAT()
         val createTagUrl = "http://localhost:8090/apis/content.halo.run/v1alpha1/tags"
-        val jsonBody = jsonMapper.writeValueAsString(tag)
+        val jsonBody = JSON_MAPPER.writeValueAsString(tag)
 
         HttpUtils.sendPostReq(createTagUrl, jsonBody, pat)
     }
@@ -139,7 +134,7 @@ class UploadServiceImpl(
         val pat = patServiceImpl.getPAT()
         val draftPostUrl = "http://localhost:8090/apis/api.console.halo.run/v1alpha1/posts"
         val postRequest = PostRequest(post, content)
-        val jsonBody = jsonMapper.writeValueAsString(postRequest)
+        val jsonBody = JSON_MAPPER.writeValueAsString(postRequest)
 
         HttpUtils.sendPostReq(draftPostUrl, jsonBody, pat)
     }
