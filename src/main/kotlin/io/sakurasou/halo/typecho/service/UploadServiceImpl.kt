@@ -4,6 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.sakurasou.halo.typecho.entity.RawMetaData
 import io.sakurasou.halo.typecho.util.HttpUtils
 import io.sakurasou.halo.typecho.util.JSON_MAPPER
+import io.sakurasou.halo.typecho.util.PAGE
 import io.sakurasou.halo.typecho.util.PinyinUtils
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
@@ -11,10 +12,10 @@ import org.springframework.stereotype.Service
 import run.halo.app.core.extension.content.Category
 import run.halo.app.core.extension.content.Post
 import run.halo.app.core.extension.content.Post.*
+import run.halo.app.core.extension.content.SinglePage
 import run.halo.app.core.extension.content.Tag
 import run.halo.app.core.extension.content.Tag.TagSpec
 import run.halo.app.extension.Metadata
-import java.io.IOException
 import java.time.Instant
 import java.util.*
 
@@ -34,7 +35,28 @@ class UploadServiceImpl(
     private val mdParser = Parser.builder().build()
     private val htmlRenderer = HtmlRenderer.builder().build()
 
-    fun handlePosts(postGroupByCategory: Map<String, List<Pair<RawMetaData, String>>>) {
+    fun handlePages(pageMap: Map<String, List<Pair<RawMetaData, String>>>): Pair<Int, Int> {
+        val pages = pageMap[PAGE] ?: return 0 to 0
+        var succeedCnt = 0
+        for ((rawMetaData, pageContent) in pages) {
+            val page = SinglePage().apply {
+                spec = generatePageSpec(rawMetaData)
+                apiVersion = CONTENT_HALO_RUN
+                kind = "SinglePage"
+                metadata = Metadata().apply {
+                    name = UUID.randomUUID().toString()
+                    annotations = mapOf("content.halo.run/preferred-editor" to "vditor-mde")
+                }
+            }
+            val document = mdParser.parse(pageContent)
+            val content = Content(pageContent, htmlRenderer.render(document), MARKDOWN)
+
+            val result = handleCreatePage(page, content)
+            if (result) succeedCnt++
+        }
+        return pages.size to succeedCnt
+    }
+
     fun handlePosts(postGroupByCategory: Map<String, List<Pair<RawMetaData, String>>>): Pair<Int, Int> {
         val categories = handleListCategories().toMutableMap()
         val tags = handleListTags().toMutableMap()
@@ -154,6 +176,23 @@ class UploadServiceImpl(
 
         return HttpUtils.sendPostReq(draftPostUrl, jsonBody, pat)
     }
+
+    private fun generatePageSpec(metaData: RawMetaData) = SinglePage.SinglePageSpec().apply {
+        title = metaData.title
+        slug = metaData.slug
+        template = ""
+        cover = ""
+        deleted = false
+        publish = true
+        pinned = false
+        allowComment = false
+        visible = VisibleEnum.PUBLIC
+        priority = 0
+        excerpt = Excerpt().apply {
+            autoGenerate = true
+            raw = ""
+        }
+        htmlMetas = listOf()
     }
 
     private fun generateTagSpec(tagName: String, tagPinyinNamed: String) = TagSpec().apply {
@@ -194,6 +233,8 @@ class UploadServiceImpl(
             tags = metaData.tags?.map { tagMap[it] } ?: emptyList()
             htmlMetas = emptyList()
         }
+
+    data class PageRequest(val page: SinglePage, val content: Content)
 
     data class PostRequest(val post: Post, val content: Content)
 
