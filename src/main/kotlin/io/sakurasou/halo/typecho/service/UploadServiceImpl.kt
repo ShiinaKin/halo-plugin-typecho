@@ -50,11 +50,15 @@ class UploadServiceImpl(
                     annotations = mapOf("content.halo.run/preferred-editor" to "vditor-mde")
                 }
             }
-            val document = mdParser.parse(pageContent)
-            val content = Content(pageContent, htmlRenderer.render(document), MARKDOWN)
+            runCatching {
+                val document = mdParser.parse(pageContent)
+                val content = Content(pageContent, htmlRenderer.render(document), MARKDOWN)
 
-            val result = handleCreatePage(page, content)
-            if (result) succeedCnt++
+                val result = handleCreatePage(page, content)
+                if (result) succeedCnt++
+            }.getOrElse {
+                logger.warn { "page: ${rawMetaData.title} create failed: ${it.message}" }
+            }
         }
         return pages.size to succeedCnt
     }
@@ -63,12 +67,11 @@ class UploadServiceImpl(
         val categories = handleListCategories().toMutableMap()
         val tags = handleListTags().toMutableMap()
 
-        var totalCnt = 0
+        var totalPostCnt = 0
         var succeedCnt = 0
 
-        for ((categoryName, posts) in postGroupByCategory) {
+        postGroupByCategory.keys.forEach { categoryName ->
             val categoryPinyinNamed = PinyinUtils.trans2Pinyin(categoryName)
-
             if (!categories.containsKey(categoryName)) {
                 val category = Category().apply {
                     spec = generateCategorySpec(categoryName, categoryPinyinNamed)
@@ -80,45 +83,66 @@ class UploadServiceImpl(
                         generateName = "category-"
                     }
                 }
-                handleCreateCategory(category)
-                categories[categoryName] = categoryPinyinNamed
-            }
-
-            for ((rawMetaData, mdContent) in posts) {
-                totalCnt++
-                val rawTags = rawMetaData.tags
-                rawTags?.filterNot { tags.containsKey(it) }?.forEach {
-                    val tagPinyinNamed = PinyinUtils.trans2Pinyin(it)
-                    val tag = Tag().apply {
-                        spec = generateTagSpec(it, tagPinyinNamed)
-                        apiVersion = CONTENT_HALO_RUN
-                        kind = "Tag"
-                        metadata = Metadata().apply {
-                            name = tagPinyinNamed
-                            generateName = "tag-"
-                        }
-                    }
-                    handleCreateTag(tag)
-                    tags[it] = tagPinyinNamed
+                try {
+                    handleCreateCategory(category)
+                    categories[categoryName] = categoryPinyinNamed
+                } catch (e: Exception) {
+                    logger.warn { "category: $categoryName create failed: ${e.message}" }
                 }
-
-                val post = Post().apply {
-                    spec = generatePostSpec(rawMetaData, categories, tags)
-                    apiVersion = CONTENT_HALO_RUN
-                    kind = "Post"
-                    metadata = Metadata().apply {
-                        name = UUID.randomUUID().toString()
-                    }
-                }
-                val document = mdParser.parse(mdContent)
-                val content = Content(mdContent, htmlRenderer.render(document), MARKDOWN)
-
-                val result = handleCreatePost(post, content)
-                if (result) succeedCnt++
             }
         }
 
-        return totalCnt to succeedCnt
+        val allPost = postGroupByCategory.flatMap { entry -> entry.value.map { entry.key to it } }
+            .sortedBy { it.second.first.date }
+
+        totalPostCnt += allPost.size
+
+        allPost.forEach { (categoryName, posts) ->
+            if (!categories.containsKey(categoryName)) return@forEach
+
+            val (rawMetaData, mdContent) = posts
+            val rawTags = rawMetaData.tags
+
+            rawTags?.filterNot { tags.containsKey(it) }?.forEach { tagName ->
+                val tagPinyinNamed = PinyinUtils.trans2Pinyin(tagName)
+                val tag = Tag().apply {
+                    spec = generateTagSpec(tagName, tagPinyinNamed)
+                    apiVersion = CONTENT_HALO_RUN
+                    kind = "Tag"
+                    metadata = Metadata().apply {
+                        name = tagPinyinNamed
+                        generateName = "tag-"
+                    }
+                }
+                runCatching {
+                    handleCreateTag(tag)
+                    tags[tagName] = tagPinyinNamed
+                }.getOrElse {
+                    logger.warn { "tag: $tagName create failed: ${it.message}" }
+                }
+            }
+
+            val post = Post().apply {
+                spec = generatePostSpec(rawMetaData, categories, tags)
+                apiVersion = CONTENT_HALO_RUN
+                kind = "Post"
+                metadata = Metadata().apply {
+                    name = UUID.randomUUID().toString()
+                }
+            }
+            val document = mdParser.parse(mdContent)
+            val content = Content(mdContent, htmlRenderer.render(document), MARKDOWN)
+
+            runCatching {
+                val result = handleCreatePost(post, content)
+                if (result) succeedCnt++
+                else logger.warn { "post: ${rawMetaData.title} create failed, more details pls see halo logs" }
+            }.getOrElse {
+                logger.warn { "post: ${rawMetaData.title} create failed: ${it.message}" }
+            }
+        }
+
+        return totalPostCnt to succeedCnt
     }
 
     private fun handleCreatePage(page: SinglePage, content: Content): Boolean {
