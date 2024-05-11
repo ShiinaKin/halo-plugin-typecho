@@ -11,6 +11,7 @@ group = "io.sakurasou.halo.typecho"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven("https://s01.oss.sonatype.org/content/repositories/releases")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
