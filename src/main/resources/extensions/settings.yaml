@@ -13,3 +13,9 @@ spec:
           validation: required
           value: ""
           help: 请在个人中心生成，必须有文章管理权限
+        - $formkit: text
+          label: Typecho使用的时区
+          name: timeZone
+          validation: required
+          value: "Asia/Shanghai"
+          help: Typecho发布文章时所在的时区
