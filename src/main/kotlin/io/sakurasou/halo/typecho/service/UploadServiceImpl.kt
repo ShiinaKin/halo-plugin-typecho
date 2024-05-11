@@ -28,12 +28,14 @@ private const val CONTENT_HALO_RUN = "content.halo.run/v1alpha1"
  */
 @Service
 class UploadServiceImpl(
-    private val patServiceImpl: PATServiceImpl
+    private val configServiceImpl: ConfigServiceImpl
 ) {
 
     private val logger = KotlinLogging.logger { this::class.java }
     private val mdParser = Parser.builder().build()
     private val htmlRenderer = HtmlRenderer.builder().build()
+    private val pat = configServiceImpl.getPAT()
+    private val zoneOffset = configServiceImpl.getTimeZone().rules.getOffset(Instant.now())
 
     fun handlePages(pageMap: Map<String, List<Pair<RawMetaData, String>>>): Pair<Int, Int> {
         val pages = pageMap[PAGE] ?: return 0 to 0
@@ -120,7 +122,6 @@ class UploadServiceImpl(
     }
 
     private fun handleCreatePage(page: SinglePage, content: Content): Boolean {
-        val pat = patServiceImpl.getPAT()
         val draftPostUrl = "http://localhost:8090/apis/api.console.halo.run/v1alpha1/singlepages"
         val postRequest = PageRequest(page, content)
         val jsonBody = JSON_MAPPER.writeValueAsString(postRequest)
@@ -139,7 +140,6 @@ class UploadServiceImpl(
     }
 
     private fun handleListTagsOrCategories(url: String): Map<String, String> {
-        val pat = patServiceImpl.getPAT()
         val respJson = HttpUtils.sendGetReq(url, pat)
         val items = JSON_MAPPER.readValue(respJson, Map::class.java)["items"] as List<*>
         return items.associate {
@@ -153,7 +153,6 @@ class UploadServiceImpl(
     }
 
     private fun handleCreateCategory(category: Category) {
-        val pat = patServiceImpl.getPAT()
         val createCategoryUrl = "http://localhost:8090/apis/content.halo.run/v1alpha1/categories"
         val jsonBody = JSON_MAPPER.writeValueAsString(category)
 
@@ -161,7 +160,6 @@ class UploadServiceImpl(
     }
 
     private fun handleCreateTag(tag: Tag) {
-        val pat = patServiceImpl.getPAT()
         val createTagUrl = "http://localhost:8090/apis/content.halo.run/v1alpha1/tags"
         val jsonBody = JSON_MAPPER.writeValueAsString(tag)
 
@@ -169,7 +167,6 @@ class UploadServiceImpl(
     }
 
     private fun handleCreatePost(post: Post, content: Content): Boolean {
-        val pat = patServiceImpl.getPAT()
         val draftPostUrl = "http://localhost:8090/apis/api.console.halo.run/v1alpha1/posts"
         val postRequest = PostRequest(post, content)
         val jsonBody = JSON_MAPPER.writeValueAsString(postRequest)
@@ -219,7 +216,7 @@ class UploadServiceImpl(
             slug = metaData.slug
             deleted = false
             publish = true
-            publishTime = Instant.now()
+            publishTime = metaData.date.toInstant(zoneOffset)
             pinned = false
             allowComment = true
             visible = VisibleEnum.PUBLIC
