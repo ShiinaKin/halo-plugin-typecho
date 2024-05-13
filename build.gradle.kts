@@ -31,6 +31,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     implementation("org.commonmark:commonmark:0.22.0")
+    implementation("org.commonmark:commonmark-ext-gfm-tables:0.22.0")
+    implementation("org.commonmark:commonmark-ext-heading-anchor:0.22.0")
     implementation("com.belerweb:pinyin4j:2.5.1")
 
     testImplementation("run.halo.app:api")

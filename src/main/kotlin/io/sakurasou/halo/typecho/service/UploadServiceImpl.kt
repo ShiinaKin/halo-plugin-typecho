@@ -6,6 +6,8 @@ import io.sakurasou.halo.typecho.util.HttpUtils
 import io.sakurasou.halo.typecho.util.JSON_MAPPER
 import io.sakurasou.halo.typecho.util.PAGE
 import io.sakurasou.halo.typecho.util.PinyinUtils
+import org.commonmark.ext.gfm.tables.TablesExtension
+import org.commonmark.ext.heading.anchor.HeadingAnchorExtension
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import org.springframework.stereotype.Service
@@ -28,12 +30,13 @@ private const val CONTENT_HALO_RUN = "content.halo.run/v1alpha1"
  */
 @Service
 class UploadServiceImpl(
-    private val configServiceImpl: ConfigServiceImpl
+    configServiceImpl: ConfigServiceImpl
 ) {
 
     private val logger = KotlinLogging.logger { this::class.java }
-    private val mdParser = Parser.builder().build()
-    private val htmlRenderer = HtmlRenderer.builder().build()
+    private val extensions = listOf(TablesExtension.create(), HeadingAnchorExtension.create())
+    private val mdParser = Parser.builder().extensions(extensions).build()
+    private val htmlRenderer = HtmlRenderer.builder().extensions(extensions).build()
     private val pat = configServiceImpl.getPAT()
     private val zoneOffset = configServiceImpl.getTimeZone().rules.getOffset(Instant.now())
 
@@ -56,6 +59,7 @@ class UploadServiceImpl(
 
                 val result = handleCreatePage(page, content)
                 if (result) succeedCnt++
+                else logger.warn { "page: ${rawMetaData.title} create failed, more details pls see halo logs" }
             }.getOrElse {
                 logger.warn { "page: ${rawMetaData.title} create failed: ${it.message}" }
             }
