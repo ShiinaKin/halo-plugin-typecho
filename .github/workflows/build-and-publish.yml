@@ -1,0 +1,37 @@
+name: Build Or Publish
+on:
+    push:
+        branches:
+            - main
+        tags:
+            - "v*"
+    pull_request:
+        branches:
+            - main
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v4
+            -   name: Setup Environment
+                uses: halo-sigs/actions/plugin-setup-env@v1
+                with:
+                    cache-dept-path: ui/pnpm-lock.yaml
+                    skip-node-setup: false
+                    node-version: 20
+                    pnpm-version: 9
+                    java-version: 17
+            -   name: Build
+                run: ./gradlew clean build
+            -   name: Upload Artifacts
+                if: github.event_name == 'pull_request'
+                uses: actions/upload-artifact@v4
+                with:
+                    name: artifacts
+                    path: build/libs
+                    retention-days: 1
+            -   name: Release
+                if: startsWith(github.ref, 'refs/tags/')
+                uses: softprops/action-gh-release@v2
+                with:
+                    files: build/libs/*
