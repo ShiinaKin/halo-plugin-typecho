@@ -11,15 +11,15 @@ spec:
   requires: ">=2.11.0"
   author:
     name: mashirot
-    website: https://github.com/mashirot
+    website: https://github.com/ShiinaKin
   logo: logo.png
   configMapName: plugin-typecho-configmap
   settingName: plugin-typecho-settings
-  homepage: https://github.com/mashirot/halo-plugin-typecho#readme
-  repo: https://github.com/mashirot/halo-plugin-typecho
-  issues: https://github.com/mashirot/halo-plugin-typecho/issues
+  homepage: https://github.com/ShiinaKin/halo-plugin-typecho#readme
+  repo: https://github.com/ShiinaKin/halo-plugin-typecho
+  issues: https://github.com/ShiinaKin/halo-plugin-typecho/issues
   displayName: "Typecho文章导入"
   description: "按文章分类导入"
   license:
     - name: "GPL-3.0"
-      url: "https://github.com/mashirot/halo-plugin-typecho/blob/main/LICENSE"
+      url: "https://github.com/ShiinaKin/halo-plugin-typecho/blob/main/LICENSE"
