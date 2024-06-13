@@ -21,6 +21,8 @@ jobs:
                     node-version: 20
                     pnpm-version: 9
                     java-version: 17
+            -   name: Build UI
+                run: cd ui && pnpm install
             -   name: Build
                 run: ./gradlew clean build
             -   name: Upload Artifacts
