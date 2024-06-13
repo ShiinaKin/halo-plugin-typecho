@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "2.0.0"
     id("com.github.node-gradle.node") version "7.0.2"
-    id("run.halo.plugin.devtools") version "0.0.8-SNAPSHOT"
+    id("run.halo.plugin.devtools") version "0.0.9"
 }
 
 group = "io.sakurasou.halo.typecho"
