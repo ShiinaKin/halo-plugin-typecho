@@ -2,7 +2,7 @@ import com.github.gradle.node.pnpm.task.PnpmTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "2.0.0"
     id("com.github.node-gradle.node") version "7.0.2"
     id("run.halo.plugin.devtools") version "0.0.8-SNAPSHOT"
 }
@@ -19,8 +19,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
-
     implementation(platform("run.halo.tools.platform:plugin:2.11.0-SNAPSHOT"))
     compileOnly("run.halo.app:api")
     implementation("commons-io:commons-io:2.16.1")
@@ -29,7 +27,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+    implementation("io.github.oshai:kotlin-logging-jvm:6.0.9")
     implementation("org.commonmark:commonmark:0.22.0")
     implementation("org.commonmark:commonmark-ext-gfm-tables:0.22.0")
     implementation("org.commonmark:commonmark-ext-heading-anchor:0.22.0")
