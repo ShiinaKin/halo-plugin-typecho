@@ -3,11 +3,13 @@ on:
     push:
         branches:
             - main
+            - dev
         tags:
             - "v*"
     pull_request:
         branches:
             - main
+            - dev
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -21,12 +23,11 @@ jobs:
                     node-version: 20
                     pnpm-version: 9
                     java-version: 17
-            -   name: Build UI
+            -   name: Install UI Packages
                 run: cd ui && pnpm install
             -   name: Build
                 run: ./gradlew clean build
             -   name: Upload Artifacts
-                if: github.event_name == 'pull_request'
                 uses: actions/upload-artifact@v4
                 with:
                     name: artifacts
