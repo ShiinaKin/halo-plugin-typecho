@@ -125,6 +125,9 @@ function handleUpload() {
         >
           <div class="text-lg">注意：</div>
           <div>
+            0. 使用前务必 <strong>备份</strong> <strong>备份</strong> <strong>备份</strong>
+          </div>
+          <div>
             1. 请在本插件的设置内填写Token, 可在 个人中心-个人令牌 生成,
             必要权限: 文章管理, 页面管理
           </div>
