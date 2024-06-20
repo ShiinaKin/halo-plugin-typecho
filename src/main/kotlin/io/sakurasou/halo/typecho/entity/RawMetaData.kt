@@ -1,11 +1,15 @@
 package io.sakurasou.halo.typecho.entity
 
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * @author mashirot
  * 2024/5/6 23:08
  */
+
+private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+
 class RawMetaData {
     val layout: String?
     val cid: Long?
@@ -20,16 +24,16 @@ class RawMetaData {
     val customSummary: String?
 
     constructor(results: Map<*, *>) {
-        layout = results["layout"] as String?
-        cid = results["cid"] as Long?
-        title = results["title"] as String?
-        slug = results["slug"] as String?
-        date = LocalDateTime.parse(results["date"] as String)
-        updated = results["updated"]?.let { LocalDateTime.parse(it as String) }
-        status = results["status"] as String?
-        author = results["author"] as String?
+        layout = results["layout"]?.toString()
+        cid = results["cid"]?.toString()?.toLong()
+        title = results["title"]?.toString()
+        slug = results["slug"]?.toString()
+        date = LocalDateTime.parse(results["date"] as String, dateTimeFormatter)
+        updated = results["updated"]?.let { LocalDateTime.parse(it as String, dateTimeFormatter) }
+        status = results["status"]?.toString()
+        author = results["author"]?.toString()
         categories = results["categories"] as List<String>?
         tags = results["tags"] as List<String>?
-        customSummary = results["customSummary"] as String?
+        customSummary = results["customSummary"]?.toString()
     }
 }
