@@ -77,7 +77,7 @@ object ParserUtils {
                 val endIdx = rawContent.indexOf("---", 3)
                 val metaDataStr = rawContent.substring(beginIndex + 3, endIdx)
                 val content = rawContent.substring(endIdx + 3)
-                val metaData = YAML_MAPPER.readValue(metaDataStr, RawMetaData::class.java)
+                val metaData = RawMetaData(YAML_MAPPER.readValue(metaDataStr, Map::class.java))
                 add(Pair(metaData, content))
             }
         }
