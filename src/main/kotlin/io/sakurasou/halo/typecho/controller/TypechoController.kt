@@ -34,8 +34,8 @@ class TypechoController(
     fun uploadTypechoFile(@RequestPart("file") file: Mono<FilePart>): Mono<Result<String>> {
         val tempFile = File("temp")
         tempFile.mkdir()
-        val uploadFile = File("temp/", System.currentTimeMillis().toString() + "")
-        val unCompressedFile = File("temp/", System.currentTimeMillis().toString() + "unz")
+        val uploadFile = File("temp", System.currentTimeMillis().toString() + "")
+        val unCompressedFile = File("temp", System.currentTimeMillis().toString() + "unz")
         uploadFile.createNewFile()
         return file.flatMap { filePart -> filePart.transferTo(uploadFile) }
             .then(Mono.just(uploadFile))
