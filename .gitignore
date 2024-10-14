@@ -21,6 +21,7 @@ bin/
 
 ### IntelliJ IDEA ###
 .idea
+.kotlin
 *.iws
 *.iml
 *.ipr
