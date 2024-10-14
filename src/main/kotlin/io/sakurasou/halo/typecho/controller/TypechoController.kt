@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 import run.halo.app.plugin.ApiVersion
 import java.io.File
@@ -31,7 +32,11 @@ class TypechoController(
     private val logger = KotlinLogging.logger { this::class.java }
 
     @PostMapping("/upload")
-    fun uploadTypechoFile(@RequestPart("file") file: Mono<FilePart>): Mono<Result<String>> {
+    fun uploadTypechoFile(@RequestPart("file") file: Mono<FilePart>, exchange: ServerWebExchange): Mono<Result<String>> {
+
+        val port = exchange.request.uri.port
+        uploadService.setBaseUrl("http://localhost:${port}")
+
         val tempFile = File("temp")
         tempFile.mkdir()
         val uploadFile = File("temp", System.currentTimeMillis().toString() + "")

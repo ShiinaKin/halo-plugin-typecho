@@ -40,6 +40,10 @@ class UploadServiceImpl(
     private val pat = configServiceImpl.getPAT()
     private val zoneOffset = configServiceImpl.getTimeZone().rules.getOffset(Instant.now())
 
+    private var baseUrl = "http://localhost:8090"
+
+    fun setBaseUrl(url: String) { baseUrl = url }
+
     fun handlePages(pageMap: Map<String, List<Pair<RawMetaData, String>>>): Pair<Int, Int> {
         val pages = pageMap[PAGE] ?: return 0 to 0
         var succeedCnt = 0
@@ -150,7 +154,7 @@ class UploadServiceImpl(
     }
 
     private fun handleCreatePage(page: SinglePage, content: Content): Boolean {
-        val draftPostUrl = "http://localhost:8090/apis/api.console.halo.run/v1alpha1/singlepages"
+        val draftPostUrl = "$baseUrl/apis/api.console.halo.run/v1alpha1/singlepages"
         val postRequest = PageRequest(page, content)
         val jsonBody = JSON_MAPPER.writeValueAsString(postRequest)
 
@@ -163,7 +167,7 @@ class UploadServiceImpl(
     }
 
     private fun handleListTags(): Map<String, String> {
-        val listCategoriesUrl = "http://localhost:8090/apis/api.console.halo.run/v1alpha1/tags?page=1&size=500"
+        val listCategoriesUrl = "$baseUrl/apis/api.console.halo.run/v1alpha1/tags?page=1&size=500"
         return handleListTagsOrCategories(listCategoriesUrl)
     }
 
@@ -181,21 +185,21 @@ class UploadServiceImpl(
     }
 
     private fun handleCreateCategory(category: Category) {
-        val createCategoryUrl = "http://localhost:8090/apis/content.halo.run/v1alpha1/categories"
+        val createCategoryUrl = "$baseUrl/apis/content.halo.run/v1alpha1/categories"
         val jsonBody = JSON_MAPPER.writeValueAsString(category)
 
         HttpUtils.sendPostReq(createCategoryUrl, jsonBody, pat)
     }
 
     private fun handleCreateTag(tag: Tag) {
-        val createTagUrl = "http://localhost:8090/apis/content.halo.run/v1alpha1/tags"
+        val createTagUrl = "$baseUrl/apis/content.halo.run/v1alpha1/tags"
         val jsonBody = JSON_MAPPER.writeValueAsString(tag)
 
         HttpUtils.sendPostReq(createTagUrl, jsonBody, pat)
     }
 
     private fun handleCreatePost(post: Post, content: Content): Boolean {
-        val draftPostUrl = "http://localhost:8090/apis/api.console.halo.run/v1alpha1/posts"
+        val draftPostUrl = "$baseUrl/apis/api.console.halo.run/v1alpha1/posts"
         val postRequest = PostRequest(post, content)
         val jsonBody = JSON_MAPPER.writeValueAsString(postRequest)
 
