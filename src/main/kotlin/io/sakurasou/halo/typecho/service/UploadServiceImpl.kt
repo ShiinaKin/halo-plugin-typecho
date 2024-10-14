@@ -30,14 +30,14 @@ private const val CONTENT_HALO_RUN = "content.halo.run/v1alpha1"
  */
 @Service
 class UploadServiceImpl(
-    configServiceImpl: ConfigServiceImpl
+    private val configServiceImpl: ConfigServiceImpl
 ) {
 
     private val logger = KotlinLogging.logger { this::class.java }
     private val extensions = listOf(TablesExtension.create(), HeadingAnchorExtension.create())
     private val mdParser = Parser.builder().extensions(extensions).build()
     private val htmlRenderer = HtmlRenderer.builder().extensions(extensions).build()
-    private val pat = configServiceImpl.getPAT()
+    private val pat by lazy { configServiceImpl.getPAT() }
     private val zoneOffset = configServiceImpl.getTimeZone().rules.getOffset(Instant.now())
 
     private var baseUrl = "http://localhost:8090"
