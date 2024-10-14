@@ -23,10 +23,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: 17
           distribution: temurin
 
       - name: Setup Gradle
@@ -36,6 +36,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
       - name: Install UI Packages
         run: cd ui && pnpm install
@@ -47,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: halo-plugin-typecho-artifact
-          path: build
+          path: build/libs/*.jar
           retention-days: 1
 
   release:
@@ -63,13 +69,20 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: halo-plugin-typecho-artifact
-          path: build
+          path: build-artifact
 
-      - name: Generate Changelog
-        run: echo "# Good things have arrived" > ${{ github.workspace }}-CHANGELOG.txt
+      - name: Generate Changelog Content
+        id: generate-changelog
+        uses: heinrichreimer/action-github-changelog-generator@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          onlyLastTag: "true"
+
+      - name: Generate Changelog File
+        run: echo "${{ steps.generate-changelog.outputs.changelog }}" > CHANGELOG.txt
 
       - name: release
         uses: softprops/action-gh-release@v2
         with:
-          body_path: ${{ github.workspace }}-CHANGELOG.txt
-          files: build/*
+          body_path: CHANGELOG.txt
+          files: build-artifact/*
