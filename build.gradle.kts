@@ -9,7 +9,7 @@ val commonmarkVersion: String by project
 plugins {
     kotlin("jvm") version "2.0.21"
     id("com.github.node-gradle.node") version "7.0.2"
-    id("run.halo.plugin.devtools") version "0.1.1"
+    id("run.halo.plugin.devtools") version "0.2.0"
 }
 
 group = "io.sakurasou.halo.typecho"
