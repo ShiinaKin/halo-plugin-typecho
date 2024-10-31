@@ -28,8 +28,8 @@ class RawMetaData {
         cid = results["cid"]?.toString()?.toLong()
         title = results["title"]?.toString()
         slug = results["slug"]?.toString()
-        date = LocalDateTime.parse(results["date"] as String, dateTimeFormatter)
-        updated = results["updated"]?.let { LocalDateTime.parse(it as String, dateTimeFormatter) }
+        date = LocalDateTime.parse(results["date"].toString(), dateTimeFormatter)
+        updated = results["updated"]?.let { LocalDateTime.parse(it.toString(), dateTimeFormatter) }
         status = results["status"]?.toString()
         author = results["author"]?.toString()
         categories = results["categories"] as List<String>?
