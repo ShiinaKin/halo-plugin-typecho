@@ -32,8 +32,8 @@ class RawMetaData {
         updated = results["updated"]?.let { LocalDateTime.parse(it.toString(), dateTimeFormatter) }
         status = results["status"]?.toString()
         author = results["author"]?.toString()
-        categories = results["categories"] as List<String>?
-        tags = results["tags"] as List<String>?
+        categories = results["categories"]?.let { (it as List<*>).map { tag -> tag.toString() } }
+        tags = results["tags"]?.let { (it as List<*>).map { tag -> tag.toString() } }
         customSummary = results["customSummary"]?.toString()
     }
 }

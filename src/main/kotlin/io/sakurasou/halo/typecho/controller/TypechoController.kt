@@ -57,7 +57,6 @@ class TypechoController(
                                 "Total Posts: ${postResult.first} Succeeded: ${postResult.second}"
                     )
                 } catch (e: Exception) {
-                    logger.error(e) { "exception on progressing..." }
                     throw e
                 }
             }
