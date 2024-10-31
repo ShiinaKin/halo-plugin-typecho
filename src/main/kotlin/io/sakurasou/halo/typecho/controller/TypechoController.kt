@@ -57,6 +57,7 @@ class TypechoController(
                                 "Total Posts: ${postResult.first} Succeeded: ${postResult.second}"
                     )
                 } catch (e: Exception) {
+                    logger.error(e) { "exception on progressing..." }
                     throw e
                 }
             }
@@ -67,12 +68,11 @@ class TypechoController(
                     FileUtils.deleteDirectory(tempFile)
                     logger.info { "unzTemp file deleted: true" }
                 } catch (e: IOException) {
-                    logger.error { "unzTemp file deleted: false" }
-                    throw e
+                    logger.error(e) { "unzTemp file deleted: false" }
                 }
             }
             .onErrorResume {
-                logger.error { it }
+                logger.error(it) { "unexpected exception handled" }
                 Mono.just(Result.failure(it.message ?: "unknown err"))
             }
     }
