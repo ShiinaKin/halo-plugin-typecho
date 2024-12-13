@@ -7,9 +7,9 @@ val jacksonVersion: String by project
 val commonmarkVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.0"
     id("com.github.node-gradle.node") version "7.0.2"
-    id("run.halo.plugin.devtools") version "0.2.0"
+    id("run.halo.plugin.devtools") version "0.4.1"
 }
 
 group = "io.sakurasou.halo.typecho"
@@ -25,7 +25,7 @@ repositories {
 dependencies {
     implementation(platform("run.halo.tools.platform:plugin:2.11.0-SNAPSHOT"))
     compileOnly("run.halo.app:api")
-    implementation("commons-io:commons-io:2.17.0")
+    implementation("commons-io:commons-io:2.18.0")
     implementation("org.apache.commons:commons-compress:1.27.0")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
