@@ -7,7 +7,7 @@ val jacksonVersion: String by project
 val commonmarkVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.1.10"
     id("com.github.node-gradle.node") version "7.0.2"
     id("run.halo.plugin.devtools") version "0.4.1"
 }
@@ -31,7 +31,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
     implementation("org.commonmark:commonmark:$commonmarkVersion")
     implementation("org.commonmark:commonmark-ext-gfm-tables:$commonmarkVersion")
     implementation("org.commonmark:commonmark-ext-heading-anchor:$commonmarkVersion")
