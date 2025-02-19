@@ -34,8 +34,8 @@ class TypechoController(
     @PostMapping("/upload")
     fun uploadTypechoFile(@RequestPart("file") file: Mono<FilePart>, exchange: ServerWebExchange): Mono<Result<String>> {
 
-        val port = exchange.request.uri.port
-        uploadService.setBaseUrl("http://localhost:${port}")
+        val port = exchange.request.uri.port.takeIf { it != -1 } ?: 8090
+        uploadService.setBaseUrl("http://localhost:$port")
 
         val tempFile = File("temp")
         tempFile.mkdir()
