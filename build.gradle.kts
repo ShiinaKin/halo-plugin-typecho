@@ -2,7 +2,6 @@ import com.github.gradle.node.pnpm.task.PnpmTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val version: String by project
 val jacksonVersion: String by project
 val commonmarkVersion: String by project
 
