@@ -71,18 +71,23 @@ jobs:
           name: halo-plugin-typecho-artifact
           path: build-artifact
 
+      - name: Get Previous Release Tag
+        run: |
+          git fetch --tags --force
+          previous_tag=$(git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 --max-count=1))
+          echo "previous_tag=$previous_tag" >> $GITHUB_ENV
+
       - name: Generate Changelog
-        id: generate-changelog
-        uses: heinrichreimer/action-github-changelog-generator@v2.4
+        uses: heinrichreimer/action-github-changelog-generator@v2.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           output: CHANGELOG.md
-          onlyLastTag: "true"
-          stripGeneratorNotice: "true"
+          sinceTag: ${{ env.previous_tag }}
+          stripGeneratorNotice: true
 
-      - name: release
+      - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "halo-plugin-typecho ${{ github.ref_name }}"
+          name: "${{ github.ref_name }}"
           body_path: CHANGELOG.md
           files: build-artifact/*
